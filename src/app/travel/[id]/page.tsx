@@ -375,7 +375,7 @@ export default function TravelDetail() {
                     >
                       {isEditing && (
                         <button
-                          onClick={() => deleteTimelineCard(card.id)}
+                          onClick={() => card.id && deleteTimelineCard(card.id)}
                           aria-label="타임라인 카드 삭제"
                           className="absolute top-4 right-4 text-red-500 hover:text-red-700 transition-colors"
                         >

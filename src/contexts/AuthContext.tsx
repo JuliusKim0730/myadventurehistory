@@ -60,7 +60,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsGuest(false);
       
       console.log('Google 로그인 성공:', result.user);
-      return result;
     } catch (error) {
       console.error('Google 로그인 실패:', error);
       
