@@ -5,67 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, MapPin, User, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { travelService, TravelRecord } from '@/lib/firestore';
 
-interface TravelRecord {
-  id: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  duration: number;
-  destinations: string[];
-  authorName: string;
-  authorId: string;
-  thumbnailUrl: string;
-  createdAt: string;
-  likes: number;
-  comments: number;
-}
-
-// 예시 데이터
-const mockTravelRecords: TravelRecord[] = [
-  {
-    id: '1',
-    title: '2024.03.15 제주도',
-    startDate: '2024-03-15',
-    endDate: '2024-03-18',
-    duration: 4,
-    destinations: ['제주시', '서귀포시', '한라산'],
-    authorName: '여행러버',
-    authorId: 'traveler1',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1539650116574-75c0c6d73c8e?w=400&h=300&fit=crop',
-    createdAt: '2024-03-20',
-    likes: 15,
-    comments: 8
-  },
-  {
-    id: '2',
-    title: '2024.02.20 일본 오사카',
-    startDate: '2024-02-20',
-    endDate: '2024-02-24',
-    duration: 5,
-    destinations: ['오사카성', '도톤보리', '교토'],
-    authorName: '일본통',
-    authorId: 'japanlover',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=300&fit=crop',
-    createdAt: '2024-02-25',
-    likes: 23,
-    comments: 12
-  },
-  {
-    id: '3',
-    title: '2024.01.10 서울 여행',
-    startDate: '2024-01-10',
-    endDate: '2024-01-12',
-    duration: 3,
-    destinations: ['명동', '강남', '홍대'],
-    authorName: '서울시민',
-    authorId: 'seoulcitizen',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=400&h=300&fit=crop',
-    createdAt: '2024-01-15',
-    likes: 31,
-    comments: 15
-  }
-];
+// 기간 계산 함수
+const calculateDuration = (start: string, end: string): number => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+};
 
 export default function Explore() {
   const { user, loading } = useAuth();
@@ -79,9 +27,19 @@ export default function Explore() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    // TODO: 실제 API에서 데이터 가져오기
-    setTravelRecords(mockTravelRecords);
-  }, []);
+    const loadTravelRecords = async () => {
+      try {
+        const records = await travelService.getAll();
+        setTravelRecords(records);
+      } catch (error) {
+        console.error('여행 기록 로딩 실패:', error);
+      }
+    };
+
+    if (user) {
+      loadTravelRecords();
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -165,13 +123,19 @@ export default function Explore() {
             >
               {/* 썸네일 이미지 */}
               <div className="aspect-video bg-gray-200 relative">
-                <img
-                  src={record.thumbnailUrl}
-                  alt={record.title}
-                  className="w-full h-full object-cover"
-                />
+                {record.thumbnailUrl ? (
+                  <img
+                    src={record.thumbnailUrl}
+                    alt={record.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-sky-200">
+                    <MapPin className="text-blue-500" size={48} />
+                  </div>
+                )}
                 <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-medium text-gray-700">
-                  {record.duration}일
+                  {calculateDuration(record.startDate, record.endDate)}일
                 </div>
               </div>
 
@@ -188,7 +152,7 @@ export default function Explore() {
 
                 <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
                   <MapPin size={14} />
-                  <span>{record.destinations.join(', ')}</span>
+                  <span>{record.destinations.map(dest => dest.name).join(', ')}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -202,11 +166,11 @@ export default function Explore() {
                   <div className="flex items-center space-x-4 text-xs text-gray-500">
                     <div className="flex items-center space-x-1">
                       <Heart size={12} />
-                      <span>{record.likes}</span>
+                      <span>0</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <MessageCircle size={12} />
-                      <span>{record.comments}</span>
+                      <span>0</span>
                     </div>
                   </div>
                 </div>

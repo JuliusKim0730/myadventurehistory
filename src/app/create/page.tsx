@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, MapPin, Plus, Trash2, Save } from 'lucide-react';
+import { travelService } from '@/lib/firestore';
 
 interface Destination {
   id: string;
@@ -61,23 +62,40 @@ export default function CreateTravel() {
     setDestinations(destinations.filter(dest => dest.id !== id));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!title || !startDate || !endDate || destinations.length === 0) {
       alert('모든 필수 정보를 입력해주세요.');
       return;
     }
+
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
     
-    // TODO: 실제 저장 로직 구현
-    console.log('저장할 데이터:', {
-      title,
-      startDate,
-      endDate,
-      destinations,
-      totalDuration: calculateDuration(startDate, endDate)
-    });
-    
-    alert('여행 기록이 저장되었습니다!');
-    router.push('/dashboard');
+    try {
+      const travelData = {
+        title,
+        startDate,
+        endDate,
+        destinations,
+        authorId: user.uid,
+        authorName: user.displayName || '익명',
+        thumbnailUrl: ''
+      };
+
+      const travelId = await travelService.create(travelData);
+      
+      if (travelId) {
+        alert('여행 기록이 저장되었습니다!');
+        router.push(`/travel/${travelId}`);
+      } else {
+        alert('저장 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('저장 실패:', error);
+      alert('저장 중 오류가 발생했습니다.');
+    }
   };
 
   if (loading) {

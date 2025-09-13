@@ -17,67 +17,15 @@ import {
   Trash2,
   User
 } from 'lucide-react';
+import { travelService, timelineService, TravelRecord, TimelineCard } from '@/lib/firestore';
 
-interface TimelineCard {
-  id: string;
-  dayNumber: number;
-  time: string;
-  title: string;
-  location: string;
-  photos?: string[];
-  referenceUrl?: string;
-  plan?: string;
-  experience?: string;
-}
-
-interface TravelDetail {
-  id: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  destinations: string[];
-  authorName: string;
-  timeline: TimelineCard[];
-}
-
-// 예시 데이터
-const mockTravelDetail: TravelDetail = {
-  id: '1',
-  title: '2024.03.15 제주도',
-  startDate: '2024-03-15',
-  endDate: '2024-03-18',
-  destinations: ['제주시', '서귀포시', '한라산'],
-  authorName: '여행러버',
-  timeline: [
-    {
-      id: '1',
-      dayNumber: 1,
-      time: '08:00',
-      title: '아침식사',
-      location: '제주공항 근처 맛집',
-      plan: '제주 흑돼지 백반으로 여행 시작!',
-      experience: '정말 맛있었어요. 현지 분위기도 좋고 가격도 합리적이었습니다.',
-      photos: ['https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=200&fit=crop']
-    },
-    {
-      id: '2',
-      dayNumber: 1,
-      time: '10:00',
-      title: '성산일출봉',
-      location: '성산일출봉',
-      plan: '유네스코 세계자연유산 탐방',
-      experience: '날씨가 좋아서 정상까지 올라갔어요. 뷰가 정말 환상적이었습니다!',
-      referenceUrl: 'https://www.jeju.go.kr/seongsan/',
-      photos: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop']
-    }
-  ]
-};
 
 export default function TravelDetail() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const [travelDetail, setTravelDetail] = useState<TravelDetail | null>(null);
+  const [travelDetail, setTravelDetail] = useState<TravelRecord | null>(null);
+  const [timeline, setTimeline] = useState<TimelineCard[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [newCard, setNewCard] = useState<Partial<TimelineCard>>({
     dayNumber: 1,
@@ -96,9 +44,24 @@ export default function TravelDetail() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    // TODO: 실제 API에서 여행 상세 정보 가져오기
-    setTravelDetail(mockTravelDetail);
-  }, [params.id]);
+    const loadTravelData = async () => {
+      if (typeof params.id === 'string') {
+        try {
+          const travel = await travelService.getById(params.id);
+          const timelineData = await timelineService.getByTravelId(params.id);
+          
+          setTravelDetail(travel);
+          setTimeline(timelineData);
+        } catch (error) {
+          console.error('여행 데이터 로딩 실패:', error);
+        }
+      }
+    };
+
+    if (user && params.id) {
+      loadTravelData();
+    }
+  }, [params.id, user]);
 
   const calculateDuration = (start: string, end: string): number => {
     const startDate = new Date(start);
@@ -107,52 +70,69 @@ export default function TravelDetail() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
   };
 
-  const addTimelineCard = () => {
+  const addTimelineCard = async () => {
     if (!newCard.title || !newCard.location || !newCard.time) {
       alert('제목, 장소, 시간은 필수 입력 항목입니다.');
       return;
     }
 
-    const card: TimelineCard = {
-      id: Date.now().toString(),
-      dayNumber: newCard.dayNumber || 1,
-      time: newCard.time || '',
-      title: newCard.title || '',
-      location: newCard.location || '',
-      plan: newCard.plan,
-      experience: newCard.experience,
-      referenceUrl: newCard.referenceUrl
-    };
-
-    if (travelDetail) {
-      const updatedTimeline = [...travelDetail.timeline, card].sort((a, b) => {
-        if (a.dayNumber !== b.dayNumber) return a.dayNumber - b.dayNumber;
-        return a.time.localeCompare(b.time);
-      });
-
-      setTravelDetail({
-        ...travelDetail,
-        timeline: updatedTimeline
-      });
+    if (!travelDetail?.id) {
+      alert('여행 정보를 찾을 수 없습니다.');
+      return;
     }
 
-    setNewCard({
-      dayNumber: 1,
-      time: '',
-      title: '',
-      location: '',
-      plan: '',
-      experience: ''
-    });
-    setShowAddCard(false);
+    try {
+      const cardData = {
+        travelId: travelDetail.id,
+        dayNumber: newCard.dayNumber || 1,
+        time: newCard.time || '',
+        title: newCard.title || '',
+        location: newCard.location || '',
+        plan: newCard.plan,
+        experience: newCard.experience,
+        referenceUrl: newCard.referenceUrl
+      };
+
+      const cardId = await timelineService.create(cardData);
+      
+      if (cardId) {
+        // 로컬 상태 업데이트
+        const newCardWithId = { ...cardData, id: cardId };
+        const updatedTimeline = [...timeline, newCardWithId].sort((a, b) => {
+          if (a.dayNumber !== b.dayNumber) return a.dayNumber - b.dayNumber;
+          return a.time.localeCompare(b.time);
+        });
+        setTimeline(updatedTimeline);
+
+        setNewCard({
+          dayNumber: 1,
+          time: '',
+          title: '',
+          location: '',
+          plan: '',
+          experience: ''
+        });
+        setShowAddCard(false);
+      } else {
+        alert('카드 추가에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('카드 추가 실패:', error);
+      alert('카드 추가에 실패했습니다.');
+    }
   };
 
-  const deleteTimelineCard = (cardId: string) => {
-    if (travelDetail) {
-      setTravelDetail({
-        ...travelDetail,
-        timeline: travelDetail.timeline.filter(card => card.id !== cardId)
-      });
+  const deleteTimelineCard = async (cardId: string) => {
+    try {
+      const success = await timelineService.delete(cardId);
+      if (success) {
+        setTimeline(timeline.filter(card => card.id !== cardId));
+      } else {
+        alert('카드 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('카드 삭제 실패:', error);
+      alert('카드 삭제에 실패했습니다.');
     }
   };
 
@@ -180,7 +160,7 @@ export default function TravelDetail() {
   }
 
   const totalDays = calculateDuration(travelDetail.startDate, travelDetail.endDate);
-  const groupedTimeline = groupByDay(travelDetail.timeline);
+  const groupedTimeline = groupByDay(timeline);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100">
@@ -234,7 +214,7 @@ export default function TravelDetail() {
                 </div>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <MapPin size={16} />
-                  <span>{travelDetail.destinations.join(', ')}</span>
+                  <span>{travelDetail.destinations.map(dest => dest.name).join(', ')}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <User size={16} />
