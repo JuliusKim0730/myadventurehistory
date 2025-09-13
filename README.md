@@ -93,11 +93,26 @@
 
 ## 🚀 배포
 
-이 프로젝트는 Vercel로 배포됩니다.
+### 라이브 사이트
+- **메인 도메인**: https://mah.vercel.app (설정 중)
+- **현재 도메인**: https://myadventurehistory-kvjees431-juliuskims-projects.vercel.app
 
+### 배포 명령어
 \`\`\`bash
+# 로컬 빌드 테스트
 npm run build
+
+# Vercel 배포
+vercel --prod
 \`\`\`
+
+### Firebase 설정 필요
+배포 후 Firebase Console에서 다음 설정이 필요합니다:
+1. Authentication → 승인된 도메인에 배포 URL 추가
+2. Firestore → 보안 규칙 설정
+3. Storage → 보안 규칙 설정
+
+자세한 내용은 \`FIREBASE_SETUP.md\` 파일을 참조하세요.
 
 ## 🤝 기여하기
 
