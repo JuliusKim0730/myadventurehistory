@@ -142,12 +142,13 @@ export default function CreateTravel() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   출발일
                 </label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                aria-label="여행 출발일"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
               </div>
               
               <div>
@@ -158,6 +159,7 @@ export default function CreateTravel() {
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
+                  aria-label="여행 종료일"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -206,6 +208,7 @@ export default function CreateTravel() {
                       type="date"
                       value={newDestination.startDate}
                       onChange={(e) => setNewDestination({ ...newDestination, startDate: e.target.value })}
+                      aria-label="여행지 시작일"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -218,6 +221,7 @@ export default function CreateTravel() {
                       type="date"
                       value={newDestination.endDate}
                       onChange={(e) => setNewDestination({ ...newDestination, endDate: e.target.value })}
+                      aria-label="여행지 종료일"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -257,6 +261,7 @@ export default function CreateTravel() {
                     
                     <button
                       onClick={() => removeDestination(destination.id)}
+                      aria-label="여행지 삭제"
                       className="text-red-500 hover:text-red-700 transition-colors"
                     >
                       <Trash2 size={16} />

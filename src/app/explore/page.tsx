@@ -131,13 +131,19 @@ export default function Explore() {
               />
             </div>
             <div className="flex gap-2">
-              <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select 
+                aria-label="여행 기간 필터"
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
                 <option value="">모든 기간</option>
                 <option value="1-3">1-3일</option>
                 <option value="4-7">4-7일</option>
                 <option value="8+">8일 이상</option>
               </select>
-              <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <select 
+                aria-label="정렬 방식"
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
                 <option value="recent">최신순</option>
                 <option value="popular">인기순</option>
                 <option value="duration">기간순</option>
@@ -213,6 +219,7 @@ export default function Explore() {
                     e.stopPropagation();
                     // TODO: 좋아요 기능
                   }}
+                  aria-label="좋아요"
                   className="bg-white/20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-white/30 transition-colors"
                 >
                   <Heart size={16} />
@@ -222,6 +229,7 @@ export default function Explore() {
                     e.stopPropagation();
                     // TODO: 공유 기능
                   }}
+                  aria-label="공유하기"
                   className="bg-white/20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-white/30 transition-colors"
                 >
                   <Share2 size={16} />
