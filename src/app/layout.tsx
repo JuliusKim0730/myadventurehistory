@@ -3,7 +3,11 @@ import './globals.css'
 import { Noto_Sans_KR } from 'next/font/google'
 import ClientWrapper from '@/components/ClientWrapper'
 
-const noto = Noto_Sans_KR({ subsets: ['latin'], variable: '--font-noto-sans-kr' })
+const noto = Noto_Sans_KR({ 
+  subsets: ['latin'], 
+  variable: '--font-noto-sans-kr',
+  display: 'swap'
+})
 
 export const metadata: Metadata = {
   title: 'My Adventure History',
@@ -13,8 +17,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
-      <body className={`${noto.variable} font-sans min-h-dvh bg-sky-gradient text-skybase-900`}>
+    <html lang="ko" className={noto.variable}>
+      <body className="font-sans min-h-dvh bg-sky-gradient text-skybase-900">
         <ClientWrapper>
           {children}
         </ClientWrapper>

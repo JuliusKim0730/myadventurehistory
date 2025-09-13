@@ -1,20 +1,19 @@
 'use client'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { onAuthStateChanged, User } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
 
 interface AuthContextType {
   user: User | null
   loading: boolean
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true
+})
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
   return context
 }
 
@@ -23,12 +22,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
-      setLoading(false)
+    // 동적 import로 Firebase auth 로드
+    const initAuth = async () => {
+      try {
+        const { auth } = await import('@/lib/firebase')
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          setUser(user)
+          setLoading(false)
+        })
+        return unsubscribe
+      } catch (error) {
+        console.error('Auth 초기화 실패:', error)
+        setLoading(false)
+      }
+    }
+
+    let unsubscribe: (() => void) | undefined
+
+    initAuth().then((unsub) => {
+      unsubscribe = unsub
     })
 
-    return unsubscribe
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
   }, [])
 
   return (
