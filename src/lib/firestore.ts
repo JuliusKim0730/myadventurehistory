@@ -18,34 +18,39 @@ import { db } from './firebase';
 export interface TravelRecord {
   id?: string;
   title: string;
-  startDate: string;
-  endDate: string;
+  startDate: Timestamp;
+  endDate: Timestamp;
+  days: number;
+  nights: number;
   destinations: Array<{
-    id: string;
     name: string;
     startDate: string;
     endDate: string;
-    duration: number;
   }>;
-  authorId: string;
-  authorName: string;
-  thumbnailUrl?: string;
-  createdAt?: Timestamp | null;
-  updatedAt?: Timestamp | null;
+  coverUrl?: string;
+  visibility: 'public' | 'private' | 'draft';
+  ownerUid: string;
+  authorNickname: string;
+  likesCount: number;
+  commentsCount: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface TimelineCard {
   id?: string;
-  travelId: string;
-  dayNumber: number;
-  time: string;
+  tripId: string;
+  day: number;
+  startTime: string;
+  endTime?: string;
   title: string;
-  location: string;
+  place?: string;
   photos?: string[];
-  referenceUrl?: string;
+  refUrl?: string;
   plan?: string;
   experience?: string;
-  createdAt?: Timestamp | null;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 // 여행 기록 CRUD 함수들
@@ -150,20 +155,27 @@ export const travelService = {
 
 // 타임라인 카드 CRUD 함수들
 export const timelineService = {
-  // 특정 여행의 타임라인 가져오기
-  async getByTravelId(travelId: string): Promise<TimelineCard[]> {
+  // 특정 여행의 모든 타임라인 가져오기
+  async getAll(tripId: string): Promise<TimelineCard[]> {
     try {
+      // 인덱스 문제 해결을 위해 단순 쿼리로 변경 후 클라이언트에서 정렬
       const q = query(
         collection(db, 'timeline'),
-        where('travelId', '==', travelId),
-        orderBy('dayNumber'),
-        orderBy('time')
+        where('tripId', '==', tripId)
       );
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      const cards = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as TimelineCard));
+      
+      // 클라이언트에서 정렬
+      return cards.sort((a, b) => {
+        if (a.day !== b.day) {
+          return a.day - b.day;
+        }
+        return a.startTime.localeCompare(b.startTime);
+      });
     } catch (error) {
       console.error('타임라인 가져오기 실패:', error);
       return [];
@@ -171,11 +183,12 @@ export const timelineService = {
   },
 
   // 새 타임라인 카드 생성
-  async create(card: Omit<TimelineCard, 'id' | 'createdAt'>): Promise<string | null> {
+  async create(card: Omit<TimelineCard, 'id' | 'createdAt' | 'updatedAt'>): Promise<string | null> {
     try {
       const docRef = await addDoc(collection(db, 'timeline'), {
         ...card,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
       return docRef.id;
     } catch (error) {
@@ -188,7 +201,10 @@ export const timelineService = {
   async update(id: string, card: Partial<TimelineCard>): Promise<boolean> {
     try {
       const docRef = doc(db, 'timeline', id);
-      await updateDoc(docRef, card);
+      await updateDoc(docRef, {
+        ...card,
+        updatedAt: serverTimestamp()
+      });
       return true;
     } catch (error) {
       console.error('타임라인 카드 업데이트 실패:', error);

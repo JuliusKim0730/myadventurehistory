@@ -1,6 +1,6 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Plane, Ship, Car, TrainFront, Github } from 'lucide-react'
+import { Plane, Ship, Car, TrainFront } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signInWithGoogle, signInAsGuest } from '@/lib/firebase'
@@ -98,13 +98,6 @@ export default function SplashHero() {
         >
           {loading === 'guest' ? '입장 중…' : '게스트로 둘러보기'}
         </button>
-        <a
-          href="https://github.com/JuliusKim0730/myadventurehistory"
-          target="_blank"
-          className="inline-flex items-center gap-2 rounded-xl bg-white/60 hover:bg-white text-skybase-800 px-4 py-3 font-medium shadow-fluffy backdrop-blur transition"
-        >
-          <Github className="h-5 w-5" /> GitHub
-        </a>
       </div>
 
       <p className="mt-6 text-center text-sm text-skybase-900/70">

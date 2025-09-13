@@ -3,10 +3,10 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 
 const config: Config = {
   content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './pages/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/app/**/*.{ts,tsx}',
+    './src/components/**/*.{ts,tsx}',
+    './src/providers/**/*.{ts,tsx}',
+    './src/contexts/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {
