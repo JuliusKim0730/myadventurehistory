@@ -37,7 +37,12 @@ export default function SplashHero() {
     initial: { y: 0 },
     animate: {
       y: [0, -8, 0],
-      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+      transition: { 
+        duration: 3, 
+        repeat: Infinity, 
+        ease: 'easeInOut' as const,
+        times: [0, 0.5, 1]
+      },
     },
   }
 
@@ -103,7 +108,7 @@ export default function SplashHero() {
       </div>
 
       <p className="mt-6 text-center text-sm text-skybase-900/70">
-        "인생을 살며, 즐겨야할 때가 있다. 남들이 짠 계획이 아닌 우리만의 모험을 해보자."
+        &ldquo;인생을 살며, 즐겨야할 때가 있다. 남들이 짠 계획이 아닌 우리만의 모험을 해보자.&rdquo;
       </p>
     </div>
   )

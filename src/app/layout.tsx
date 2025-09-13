@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Noto_Sans_KR } from 'next/font/google'
+import { AuthProvider } from '@/providers/AuthProvider'
 
 const noto = Noto_Sans_KR({ subsets: ['latin'], variable: '--font-noto-sans-kr' })
 
@@ -14,10 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className={`${noto.variable} font-sans min-h-dvh bg-sky-gradient text-skybase-900`}>
-        {/* page container */}
-        <div className="relative min-h-dvh">
-          {children}
-        </div>
+        <AuthProvider>
+          <div className="relative min-h-dvh">
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )
