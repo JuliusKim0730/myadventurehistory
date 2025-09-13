@@ -9,9 +9,20 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'firebasestorage.googleapis.com',
       },
     ],
+  },
+  // Vercel 배포 최적화
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
+  // 빌드 시 경고 무시 설정
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
   },
 };
 

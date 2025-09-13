@@ -1,5 +1,8 @@
 {
   "projectSettings": {
     "name": "mah"
-  }
+  },
+  "buildCommand": "npm run build",
+  "framework": "nextjs",
+  "regions": ["iad1"]
 }
