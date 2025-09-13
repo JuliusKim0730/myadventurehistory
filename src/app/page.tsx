@@ -18,10 +18,13 @@ export default function Home() {
 
   const handleGoogleLogin = async () => {
     try {
+      console.log('Google 로그인 시도 중...');
       await signInWithGoogle();
+      console.log('로그인 성공, 대시보드로 이동');
       router.push('/dashboard');
     } catch (error) {
       console.error('로그인 실패:', error);
+      // 에러는 AuthContext에서 이미 처리됨
     }
   };
 

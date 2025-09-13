@@ -53,10 +53,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      provider.addScope('email');
+      provider.addScope('profile');
+      
+      const result = await signInWithPopup(auth, provider);
       setIsGuest(false);
+      
+      console.log('Google 로그인 성공:', result.user);
+      return result;
     } catch (error) {
       console.error('Google 로그인 실패:', error);
+      
+      // 에러 메시지를 사용자에게 표시
+      if (error instanceof Error) {
+        alert(`로그인 실패: ${error.message}`);
+      } else {
+        alert('로그인 중 오류가 발생했습니다.');
+      }
+      throw error;
     }
   };
 

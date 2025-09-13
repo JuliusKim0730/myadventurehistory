@@ -9,7 +9,8 @@ import {
   query, 
   orderBy,
   where,
-  serverTimestamp 
+  serverTimestamp,
+  Timestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -29,8 +30,8 @@ export interface TravelRecord {
   authorId: string;
   authorName: string;
   thumbnailUrl?: string;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
+  createdAt?: Timestamp | null;
+  updatedAt?: Timestamp | null;
 }
 
 export interface TimelineCard {
@@ -44,7 +45,7 @@ export interface TimelineCard {
   referenceUrl?: string;
   plan?: string;
   experience?: string;
-  createdAt?: Date | null;
+  createdAt?: Timestamp | null;
 }
 
 // 여행 기록 CRUD 함수들

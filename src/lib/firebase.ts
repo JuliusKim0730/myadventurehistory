@@ -28,8 +28,20 @@ export const storage = getStorage(app);
 // Analytics는 클라이언트 사이드에서만 초기화
 let analytics;
 if (typeof window !== 'undefined') {
-  analytics = getAnalytics(app);
+  try {
+    analytics = getAnalytics(app);
+    console.log('Firebase Analytics 초기화 완료');
+  } catch (error) {
+    console.warn('Firebase Analytics 초기화 실패:', error);
+  }
 }
 export { analytics };
+
+// Firebase 연결 상태 확인
+console.log('Firebase 설정:', {
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+  storageBucket: firebaseConfig.storageBucket
+});
 
 export default app;
