@@ -29,8 +29,8 @@ export interface TravelRecord {
   authorId: string;
   authorName: string;
   thumbnailUrl?: string;
-  createdAt?: any;
-  updatedAt?: any;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 }
 
 export interface TimelineCard {
@@ -44,7 +44,7 @@ export interface TimelineCard {
   referenceUrl?: string;
   plan?: string;
   experience?: string;
-  createdAt?: any;
+  createdAt?: Date | null;
 }
 
 // 여행 기록 CRUD 함수들

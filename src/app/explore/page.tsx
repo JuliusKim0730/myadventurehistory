@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, MapPin, User, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { travelService, TravelRecord } from '@/lib/firestore';
+import Image from 'next/image';
 
 // 기간 계산 함수
 const calculateDuration = (start: string, end: string): number => {
@@ -124,10 +125,11 @@ export default function Explore() {
               {/* 썸네일 이미지 */}
               <div className="aspect-video bg-gray-200 relative">
                 {record.thumbnailUrl ? (
-                  <img
+                  <Image
                     src={record.thumbnailUrl}
                     alt={record.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-sky-200">

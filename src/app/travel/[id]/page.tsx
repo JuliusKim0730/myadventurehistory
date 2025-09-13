@@ -11,13 +11,13 @@ import {
   Clock, 
   Plus, 
   Edit3, 
-  Camera, 
   Link,
   Save,
   Trash2,
   User
 } from 'lucide-react';
 import { travelService, timelineService, TravelRecord, TimelineCard } from '@/lib/firestore';
+import Image from 'next/image';
 
 
 export default function TravelDetail() {
@@ -436,12 +436,14 @@ export default function TravelDetail() {
                           {card.photos && card.photos.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                               {card.photos.map((photo, photoIndex) => (
-                                <img
-                                  key={photoIndex}
-                                  src={photo}
-                                  alt={`${card.title} 사진 ${photoIndex + 1}`}
-                                  className="w-full h-32 object-cover rounded-lg"
-                                />
+                                <div key={photoIndex} className="relative w-full h-32 rounded-lg overflow-hidden">
+                                  <Image
+                                    src={photo}
+                                    alt={`${card.title} 사진 ${photoIndex + 1}`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
                               ))}
                             </div>
                           )}
